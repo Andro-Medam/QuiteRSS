@@ -5,16 +5,16 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <fragment
-        android:id="@+id/frag_bar"
+    <FrameLayout
+        android:id="@+id/frag_bar_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />
 
-    <fragment
-        android:id="@+id/frag_main"
+    <FrameLayout
+        android:id="@+id/frag_main_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/frag_bar"/>
+        android:layout_below="@+id/frag_bar_container" />
 
 </RelativeLayout>
