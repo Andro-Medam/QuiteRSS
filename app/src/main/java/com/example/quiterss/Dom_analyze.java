@@ -1,5 +1,7 @@
 package com.example.quiterss;
 
+import android.widget.Toast;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -22,6 +24,7 @@ public class Dom_analyze {
             for(int i = 0; i < itemlist.getLength(); i++) {
                 System.out.println("----------"+(i+1) + ":");
                 Node n = itemlist.item(i);
+                String title = null, description= null, link= null, pubDate= null, guid = null;
                 NamedNodeMap attrs = n.getAttributes();
                 //System.out.println("有" + attrs.getLength() + "个属性：");
                 NodeList childNodes = n.getChildNodes();
@@ -29,18 +32,38 @@ public class Dom_analyze {
                 for (int k = 0; k < childNodes.getLength(); k++) {
                     //区分出text类型的node以及element类型的node
                     if (childNodes.item(k).getNodeType() == Node.ELEMENT_NODE) {
-                        //获取了element类型节点的节点名
-                        //System.out.print("第" + (k + 1) + "个节点的节点名：" + childNodes.item(k).getNodeName());
-                        //获取了element类型节点的节点值
-                        // System.out.println("--节点值是：" + childNodes.item(k).getFirstChild().getNodeValue());
-                        //System.out.println("--节点值是：" + childNodes.item(k).getTextContent());
+                        switch (childNodes.item(k).getNodeName()) {
+                            case "title":
+                                title = childNodes.item(k).getTextContent();
+                                //System.out.println("---" + title);
+                                break;
+                            case "description":
+                                description = childNodes.item(k).getTextContent();
+                                break;
+                            case "link":
+                                link = childNodes.item(k).getTextContent();
+                                break;
+                            case "pubDate":
+                                pubDate = childNodes.item(k).getTextContent();
+                                break;
+                            case "guid":
+                                guid = childNodes.item(k).getTextContent();
+                                break;
+                            default:
+                                break;
+                            //获取了element类型节点的节点名
+                            //System.out.print("第" + (k + 1) + "个节点的节点名：" + childNodes.item(k).getNodeName());
+                            //获取了element类型节点的节点值
+                            // System.out.println("--节点值是：" + childNodes.item(k).getFirstChild().getNodeValue());
+                            //System.out.println("--节点值是：" + childNodes.item(k).getTextContent());
+                        }
                     }
                 }
             }
 
 
         }catch (Exception e){
-
+            //Toast.makeText(getActivity(), "you clicked more!", Toast.LENGTH_SHORT).show();
         }
     }
 }
