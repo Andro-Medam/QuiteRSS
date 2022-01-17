@@ -4,9 +4,11 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ExpandableListView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,6 +21,9 @@ public class MainFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private ExpandableListView elv;
+    private MySQLiteOpenHelper mySQLiteOpenHelper;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -59,7 +64,17 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        mySQLiteOpenHelper = new MySQLiteOpenHelper(getActivity());
+        elv = view.findViewById(R.id.main_elv);
+        final String[] group = mySQLiteOpenHelper.QueryAllFolder();
+        final String[][] child = new String[group.length][];
+        for (int i = 0; i < group.length; i++){
+            child[i] = mySQLiteOpenHelper.QueryItemByFolder(group[i]);
+        }
+        ExpandedAdapter adapter = new ExpandedAdapter(getActivity(), group, child);
+        int size = adapter.getGroupCount();
+        elv.setAdapter(adapter);
+        return view;
     }
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/folder_expanded"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:paddingTop="5dp"/>
+
+    <TextView
+        android:id="@+id/folder_name"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@+id/folder_expanded"
+        android:textSize="25dp" />
+
+</RelativeLayout>

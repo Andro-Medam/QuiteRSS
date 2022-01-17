@@ -8,7 +8,7 @@ public class Item {
     private String pubDate;
     private String guid;
     private String channel;
-    private String folder;
+    private int read;
 
     public int getId() {
         return id;
@@ -66,12 +66,12 @@ public class Item {
         this.channel = channel;
     }
 
-    public String getFolder() {
-        return folder;
+    public int getRead() {
+        return read;
     }
 
-    public void setFolder(String folder) {
-        this.folder = folder;
+    public void setRead(int read) {
+        this.read = read;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class Item {
                 ", pubDate='" + pubDate + '\'' +
                 ", guid='" + guid + '\'' +
                 ", channel='" + channel + '\'' +
-                ", folder='" + folder + '\'' +
+                ", read=" + read +
                 '}';
     }
 }

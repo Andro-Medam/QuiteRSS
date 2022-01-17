@@ -3,10 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ExpandableListView
-        android:id="@+id/main_elv"
+    <TextView
+        android:id="@+id/item_name"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:groupIndicator="@null"/>
+        android:maxLines="1"
+        android:layout_marginLeft="30dp"
+        android:text="文章名"
+        android:textSize="20dp"/>
 
 </RelativeLayout>

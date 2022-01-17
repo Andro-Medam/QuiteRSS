@@ -72,7 +72,11 @@ public class BarFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.frag_main_container, new SearchFragment()).addToBackStack(null).commit();
+                SearchFragment searchFragment = new SearchFragment();
+                Bundle args = new Bundle();
+                args.putString("toSearch", String.valueOf(search_et));
+                searchFragment.setArguments(args);
+                fragmentManager.beginTransaction().replace(R.id.frag_main_container, searchFragment).addToBackStack(null).commit();
             }
         });
         more_iv.setOnClickListener(new View.OnClickListener() {
