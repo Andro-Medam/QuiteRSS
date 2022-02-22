@@ -1,22 +1,13 @@
 package com.example.quiterss.bean;
 
 public class Item {
-    private int id;
     private String title;
     private String description;
     private String link;
     private String pubDate;
     private String guid;
     private String channel;
-    private int read;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    private int read;       //0未读，1已读
 
     public String getTitle() {
         return title;
@@ -77,7 +68,6 @@ public class Item {
     @Override
     public String toString() {
         return "Item{" +
-                "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", link='" + link + '\'' +

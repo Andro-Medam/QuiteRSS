@@ -1,6 +1,7 @@
 package com.example.quiterss;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,16 +11,19 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.List;
+
 public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapter.RecyclerViewHolder> {
 
     private Context mContext;
     private MySQLiteOpenHelper mySQLiteOpenHelper;
     private String toSearch;
-    private String[] searchItem;
+    private List<String> searchItem;
 
     public RecyclerviewAdapter(Context context, String s){
         this.mContext = context;
         toSearch = s;
+        mySQLiteOpenHelper = new MySQLiteOpenHelper(mContext);
     }
 
     @NonNull
@@ -31,7 +35,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int position) {
-        holder.tv.setText(searchItem[position]);
+        holder.tv.setText(searchItem.get(position));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -42,9 +46,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
 
     @Override
     public int getItemCount() {
-        mySQLiteOpenHelper = new MySQLiteOpenHelper(mContext);
         searchItem = mySQLiteOpenHelper.QueryItemByName(toSearch);
-        return searchItem.length;
+        return searchItem.size();
     }
 
     class RecyclerViewHolder extends RecyclerView.ViewHolder{

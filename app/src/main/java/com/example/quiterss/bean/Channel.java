@@ -1,18 +1,10 @@
 package com.example.quiterss.bean;
 
 public class Channel {
-    private int id;
     private String title;
     private String description;
     private String link;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    private String RSSlink;
 
     public String getTitle() {
         return title;
@@ -38,13 +30,21 @@ public class Channel {
         this.link = link;
     }
 
+    public String getRSSlink() {
+        return RSSlink;
+    }
+
+    public void setRSSlink(String RSSlink) {
+        this.RSSlink = RSSlink;
+    }
+
     @Override
     public String toString() {
         return "Channel{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
+                "title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", link='" + link + '\'' +
+                ", RSSlink='" + RSSlink + '\'' +
                 '}';
     }
 }

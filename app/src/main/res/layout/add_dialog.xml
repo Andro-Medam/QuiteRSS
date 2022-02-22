@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/add_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请输入RSS订阅网址："
+        android:textSize="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"/>
+
+    <EditText
+        android:id="@+id/insert_url_et"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/add_tv"
+        android:background="@drawable/search_background"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="5dp"/>
+
+
+
+</RelativeLayout>

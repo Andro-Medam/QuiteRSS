@@ -1,16 +1,23 @@
 package com.example.quiterss;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
+
+import com.example.quiterss.bean.Folder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,8 +28,9 @@ public class BarFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    EditText search_et;
-    ImageView search_iv, more_iv;
+    private EditText search_et;
+    private ImageView search_iv, more_iv;
+    private MySQLiteOpenHelper mySQLiteOpenHelper;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -65,6 +73,7 @@ public class BarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bar, container, false);
+        mySQLiteOpenHelper = new MySQLiteOpenHelper(getActivity());
         search_et = view.findViewById(R.id.search_et);
         search_iv = view.findViewById(R.id.search_iv);
         more_iv = view.findViewById(R.id.more_iv);
@@ -74,7 +83,7 @@ public class BarFragment extends Fragment {
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 SearchFragment searchFragment = new SearchFragment();
                 Bundle args = new Bundle();
-                args.putString("toSearch", String.valueOf(search_et));
+                args.putString("toSearch", search_et.getText().toString());
                 searchFragment.setArguments(args);
                 fragmentManager.beginTransaction().replace(R.id.frag_main_container, searchFragment).addToBackStack(null).commit();
             }
@@ -82,9 +91,81 @@ public class BarFragment extends Fragment {
         more_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                showPopupMenu(view);
                 Toast.makeText(getActivity(), "you clicked more!", Toast.LENGTH_SHORT).show();
             }
         });
         return view;
     }
+
+    private void showPopupMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(getActivity(), view);
+        popupMenu.getMenuInflater().inflate(R.menu.more_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener(){
+            @Override
+            public boolean onMenuItemClick(MenuItem item){
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                switch (item.getItemId()){
+                    case R.id.add_url://添加url
+                        View urlView = getLayoutInflater().inflate(R.layout.add_dialog, null);
+                        builder.setView(urlView)
+                                .setPositiveButton("订阅", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        EditText et = urlView.findViewById(R.id.add_url);
+                                        mySQLiteOpenHelper.InsertItemFromURL(et.getText().toString());
+                                    }
+                                })
+                                .show();
+                        //mySQLiteOpenHelper.InsertItemFromURL(                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         );
+                        return true;
+                    case R.id.add_folder://添加文件夹
+                        View folderView = getLayoutInflater().inflate(R.layout.add_folder, null);
+                        builder.setView(folderView)
+                                .setPositiveButton("添加", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        EditText et = folderView.findViewById(R.id.insert_file_et);
+
+                                        if(!et.getText().toString().equals(null)){
+                                            Folder folder = new Folder();
+                                            folder.setName(et.getText().toString());
+                                            Log.d("--------------", et.getText().toString());
+                                            mySQLiteOpenHelper.InsertFolder(folder);
+                                        }
+                                        else {
+                                            Toast.makeText(getActivity(), "输入不能为空", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                })
+                                .show();
+                        return true;
+                    case R.id.refresh_url://刷新url
+                        return true;
+                    default:
+                        return false;
+                }
+            }});
+        popupMenu.show();
+    }
+
+//    @Override
+//    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+//        inflater.inflate(R.menu.more_menu, menu);
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        switch (item.getItemId()){
+//            case R.id.add_url://添加url
+//                return true;
+//            case R.id.add_folder://添加文件夹
+//                return true;
+//            case R.id.refresh_url://刷新url
+//                return true;
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+//
+//    }
 }

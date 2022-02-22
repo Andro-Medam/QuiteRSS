@@ -10,6 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
+import com.example.quiterss.bean.Channel;
+import com.example.quiterss.bean.Folder;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MainFragment#newInstance} factory method to
@@ -66,13 +72,15 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         mySQLiteOpenHelper = new MySQLiteOpenHelper(getActivity());
+
         elv = view.findViewById(R.id.main_elv);
-        final String[] group = mySQLiteOpenHelper.QueryAllFolder();
-        final String[][] child = new String[group.length][];
-        for (int i = 0; i < group.length; i++){
-            child[i] = mySQLiteOpenHelper.QueryItemByFolder(group[i]);
+        List<String> group = mySQLiteOpenHelper.QueryAllFolder();
+        List<List<String>> child = new ArrayList<List<String>>();
+        for (int i = 0; i < group.size(); i++){
+            child.add(mySQLiteOpenHelper.QueryItemByFolder(group.get(i)));
         }
         ExpandedAdapter adapter = new ExpandedAdapter(getActivity(), group, child);
+
         int size = adapter.getGroupCount();
         elv.setAdapter(adapter);
         return view;
