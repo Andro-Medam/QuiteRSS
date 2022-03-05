@@ -4,19 +4,19 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/add_tv"
+        android:id="@+id/rename_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="添加文件夹名称："
+        android:text="修改文件夹名称："
         android:textSize="20dp"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="15dp"/>
 
     <EditText
-        android:id="@+id/insert_file_et"
+        android:id="@+id/rename_folder_et"
         android:layout_width="250dp"
         android:layout_height="30dp"
-        android:layout_below="@+id/add_tv"
+        android:layout_below="@+id/rename_tv"
         android:background="@drawable/search_background"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="5dp"/>

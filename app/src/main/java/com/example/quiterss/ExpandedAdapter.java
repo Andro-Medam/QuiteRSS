@@ -1,16 +1,28 @@
 package com.example.quiterss;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.quiterss.bean.Folder;
+import com.example.quiterss.bean.Folder_item;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExpandedAdapter extends BaseExpandableListAdapter {
@@ -27,6 +39,23 @@ public class ExpandedAdapter extends BaseExpandableListAdapter {
         this.group = group;
         this.child = child;
         mySQLiteOpenHelper = new MySQLiteOpenHelper(mContext);
+    }
+
+    public ExpandedAdapter(Context context){
+        mInflater = LayoutInflater.from(context);
+        mContext = context;
+        child = new ArrayList<List<String>>();
+        mySQLiteOpenHelper = new MySQLiteOpenHelper(mContext);
+        group = mySQLiteOpenHelper.QueryAllFolder();
+
+        for(int i = 0; i < group.size(); i++){
+            child.add(mySQLiteOpenHelper.QueryItemByFolder(group.get(i)));
+        }
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
     }
 
     @Override
@@ -76,6 +105,13 @@ public class ExpandedAdapter extends BaseExpandableListAdapter {
         else {
             iv.setImageResource(R.mipmap.arrow_down);
         }
+        tv.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                showPopupMenuGroup(view, groupPosition);
+                return false;
+            }
+        });
         return view;
     }
 
@@ -91,8 +127,16 @@ public class ExpandedAdapter extends BaseExpandableListAdapter {
         tv.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                showPopupMenu(view);
+                showPopupMenuItem(view, groupPosition, childPosition);
                 return false;
+            }
+        });
+        tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mContext, ReadActivity.class);
+                intent.putExtra("title", child.get(groupPosition).get(childPosition));
+                mContext.startActivity(intent);
             }
         });
         return view;
@@ -103,20 +147,120 @@ public class ExpandedAdapter extends BaseExpandableListAdapter {
         return false;
     }
 
-    private void showPopupMenu(View view){
+    private void showPopupMenuGroup(View view, int groupPosition){
         PopupMenu popupMenu = new PopupMenu(mContext, view);
-        popupMenu.getMenuInflater().inflate(R.menu.item_longclick_menu, popupMenu.getMenu());
+        popupMenu.getMenuInflater().inflate(R.menu.group_longclick_menu, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                 switch (menuItem.getItemId()){
-                    case R.id.show_detail:
+                    case R.id.add_folder:
+                        View folderView = mInflater.inflate(R.layout.add_folder_dialog, null);
+                        builder.setView(folderView)
+                                .setPositiveButton("添加", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        EditText et = folderView.findViewById(R.id.insert_folder_et);
+                                        if (!et.getText().toString().equals("")) {
+                                            Folder folder = new Folder();
+                                            folder.setName(et.getText().toString());
+                                            if (mySQLiteOpenHelper.InsertFolder(folder) != -1){
+                                                group.add(et.getText().toString());
+                                                child.add(new ArrayList<String>());
+                                                Toast.makeText(mContext, "添加成功", Toast.LENGTH_SHORT).show();
+                                            }
+                                            else
+                                                Toast.makeText(mContext, "添加出错，请重新检查！", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(mContext, "输入不能为空", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                })
+                                .show();
                         return true;
-                    case R.id.add_to_folder:
+                    case R.id.delete_folder:
+                        View delete_dialog = mInflater.inflate(R.layout.delete_folder_dialog, null);
+                        CheckBox checkBox = delete_dialog.findViewById(R.id.delete_items_cb);
+                        ArrayList<CompoundButton> selected = new ArrayList<>();
+                        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                                if(b)
+                                    selected.add(compoundButton);
+                                else
+                                    selected.remove(compoundButton);
+                            }
+                        });
+                        builder.setView(delete_dialog)
+                                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        mySQLiteOpenHelper.DeleteFolderByName(group.get(groupPosition));
+                                        if (selected.size() > 0){
+                                            mySQLiteOpenHelper.DeleteItemByChannel(group.get(groupPosition));
+                                        }
+                                        mySQLiteOpenHelper.DeleteFIByFolderName(group.get(groupPosition));
+                                        child.remove(groupPosition);
+                                        group.remove(groupPosition);
+                                    }
+                                })
+                                .show();
+                        return true;
+                    case R.id.rename_folder:
+                        View rename_dialog = mInflater.inflate(R.layout.rename_folder_dialog, null);
+                        builder.setView(rename_dialog)
+                                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        EditText editText = rename_dialog.findViewById(R.id.rename_folder_et);
+                                        if (editText.getText().toString().equals(""))
+                                            Toast.makeText(mContext, "文件夹名称不能为空", Toast.LENGTH_SHORT).show();
+                                        else {
+                                            if (mySQLiteOpenHelper.UpdateFolderByName(group.get(groupPosition), editText.getText().toString()) != -1){
+                                                group.set(groupPosition, editText.getText().toString());
+                                                Toast.makeText(mContext, "修改成功", Toast.LENGTH_SHORT).show();
+                                            }
+                                            else
+                                                Toast.makeText(mContext, "文件夹名称修改错误，请重新检查！", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                    }
+                                }).show();
                         return true;
                     default:
                         return false;
                 }
+            }
+        });
+        popupMenu.show();
+    }
+
+    private void showPopupMenuItem(View view, int groupPosition, int childPosition){
+        PopupMenu popupMenu = new PopupMenu(mContext, view);
+        popupMenu.getMenuInflater().inflate(R.menu.item_longclick_menu, popupMenu.getMenu());
+        SubMenu subMenu = popupMenu.getMenu().addSubMenu("添加到文件夹");
+        for(int i = 0; i < group.size(); i++){
+            subMenu.add(1, i+1, 1,group.get(i));
+        }
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if (menuItem.getGroupId() == 1){
+                    int f = menuItem.getItemId();
+                    Log.d("aaaaaaaaaaaaaa", "onMenuItemClick: " + f);
+                    Folder_item folder_item = new Folder_item();
+                    folder_item.setFolderName(group.get(f-1));
+                    folder_item.setItemName(child.get(groupPosition).get(childPosition));
+                    if (mySQLiteOpenHelper.InsertFolderItem(folder_item) == -1){
+                        Toast.makeText(mContext, "该文件已经存在！", Toast.LENGTH_SHORT).show();
+                    }else{
+                        child.get(f-1).add(child.get(groupPosition).get(childPosition));
+                    }
+
+                }
+                return true;
             }
         });
         popupMenu.show();

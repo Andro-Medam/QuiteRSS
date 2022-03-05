@@ -20,13 +20,19 @@
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/add_dialog.xml" value="0.4" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/add_file.xml" value="0.14947916666666666" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/add_folder.xml" value="0.25364583333333335" />
+        <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/add_folder_dialog.xml" value="0.1" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/add_to_folder.xml" value="0.25364583333333335" />
+        <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/delete_folder_dialog.xml" value="0.4" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/elv_item_child.xml" value="0.17447916666666666" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/elv_item_header.xml" value="0.17447916666666666" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/fragment_bar.xml" value="0.25364583333333335" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/fragment_main.xml" value="0.1" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/fragment_search_listview.xml" value="0.17239583333333333" />
+        <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/read_item.xml" value="0.12512664640324214" />
+        <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/refresh_dialog.xml" value="0.17291666666666666" />
+        <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/rename_folder_dialog.xml" value="0.1328125" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/layout/rv_item.xml" value="0.1296875" />
+        <entry key="..\:/repo/QuiteRSS/app/src/main/res/menu/group_longclick_menu.xml" value="0.1359375" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/menu/item_longclick_menu.xml" value="0.1" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/menu/itrm_longclick_menu.xml" value="0.4" />
         <entry key="..\:/repo/QuiteRSS/app/src/main/res/menu/more_menu.xml" value="0.2" />

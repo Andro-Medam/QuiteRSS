@@ -4,9 +4,5 @@
 
     <item android:id="@+id/show_detail"
         android:title="显示详情" />
-    <item android:id="@+id/add_to_folder"
-        android:title="添加到文件夹" />
-
-
 
 </menu>

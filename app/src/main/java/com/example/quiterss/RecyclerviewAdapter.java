@@ -1,6 +1,7 @@
 package com.example.quiterss;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +40,10 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(mContext, "you clicked search", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "you clicked search", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(mContext, ReadActivity.class);
+                intent.putExtra("title", searchItem.get(holder.getAdapterPosition()));
+                mContext.startActivity(intent);
             }
         });
     }

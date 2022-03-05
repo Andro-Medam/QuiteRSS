@@ -38,9 +38,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
             "title text, description text, link text, RSSlink text unique not null);\n";
     private static final String CREATE_TABLE_FOLDER = "create table " + TABLE_NAME_FOLDER + " (id integer primary key autoincrement, " +
             "name text unique not null);\n";
-    private static final String CREATE_TABLE_FOLDER_ITEM = "create table " + TABLE_NAME_FOLDER_ITEM + " (id integer primary key autoincrement, " +
-            "itemName text, folderName text);\n";
-
+    private static final String CREATE_TABLE_FOLDER_ITEM = "create table " + TABLE_NAME_FOLDER_ITEM + " (itemName text, folderName text, PRIMARY KEY(itemName,folderName));\n";
 
     public MySQLiteOpenHelper(Context context) {
         super(context, DB_NAME, null, 1);
@@ -52,23 +50,18 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_TABLE_CHANNEL);
         sqLiteDatabase.execSQL(CREATE_TABLE_FOLDER);
         sqLiteDatabase.execSQL(CREATE_TABLE_FOLDER_ITEM);
-        sqLiteDatabase.execSQL("insert into folder values(0, 'a')");
-        sqLiteDatabase.execSQL("insert into folder values(1, 'b')");
-        sqLiteDatabase.execSQL("insert into folder_item values(0, 'aa', 'a')");
-        sqLiteDatabase.execSQL("insert into folder_item values(1, 'ab', 'a')");
-        sqLiteDatabase.execSQL("insert into folder_item values(2, 'ac', 'a')");
-        sqLiteDatabase.execSQL("insert into folder_item values(3, 'ba', 'b')");
-        sqLiteDatabase.execSQL("insert into folder_item values(4, 'bb', 'b')");
-
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    }
 
+    public boolean deleteDatabase(Context context, String databaseName) {
+        return context.deleteDatabase(databaseName);
     }
 
     /*插入item，-1插入失败*/
-    public int InsertItem(Item item){
+    public long InsertItem(Item item){
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -82,7 +75,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
 
         Log.d("AA", "insert an item");
 
-        return (int) db.insert(TABLE_NAME_ITEM, null, values);
+        return db.insert(TABLE_NAME_ITEM, null, values);
     }
 
 
@@ -178,6 +171,11 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
         db.delete(TABLE_NAME_CHANNEL, "title = ?", new String[] {channel});
     }
 
+    public void DeleteFIByFolderName(String folderName){
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NAME_FOLDER_ITEM, "folderName = ?", new String[] {folderName});
+    }
+
     /*
     插入channel
      */
@@ -194,25 +192,23 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
 
     }
 
-    public void InsertFolderItem(Folder_item folder_item){
+    public long InsertFolderItem(Folder_item folder_item){
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put("folderName", folder_item.getFolderName());
         values.put("itemName", folder_item.getItemName());
 
-        db.insert(TABLE_NAME_FOLDER_ITEM, null, values);
+        return db.insert(TABLE_NAME_FOLDER_ITEM, null, values);
     }
 
-    public void InsertFolder(Folder folder){
+    public long InsertFolder(Folder folder){
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put("name", folder.getName());
 
-        long z = db.insert(TABLE_NAME_FOLDER, null, values);
-        if (z != -1)
-            Log.d("addFolder", "add a folder:" + folder.getName());
+        return db.insert(TABLE_NAME_FOLDER, null, values);
     }
 
     public List<String> QueryItemByName(String name){
@@ -221,7 +217,6 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
         String s = "select * from " + TABLE_NAME_ITEM + " where title like \"%" + name + "%\"";
         Cursor cursor = db.rawQuery(s, null);
         List<String> re = new ArrayList<String>();
-        int i = 0;
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 re.add(cursor.getString(1));
@@ -230,6 +225,38 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
         }
         db.close();
         return re;
+    }
+
+    public Item QueryItem(String name){
+        SQLiteDatabase db = getWritableDatabase();
+
+        Cursor cursor = db.query(TABLE_NAME_ITEM, null, "title = ?", new String[]{name}, null, null, null);
+        Item item = new Item();
+        Log.d("xxxxxxxxxxx", "QueryItem: " + name);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                item.setTitle(cursor.getString(1));
+                item.setDescription(cursor.getString(2));
+            }
+            Log.d("xxxxxxxxxxx", "QueryItem: " + cursor.getCount());
+            cursor.close();
+        }
+        db.close();
+        return item;
+    }
+
+    public Boolean QueryItemExist(String name){
+        SQLiteDatabase db = getWritableDatabase();
+
+        Cursor cursor = db.query(TABLE_NAME_ITEM, null, "title = ?", new String[]{name}, null, null, null);
+        if (cursor.getCount() > 0){
+            cursor.close();
+            return true;
+        }
+        else{
+            cursor.close();
+            return false;
+        }
     }
 
     /*
@@ -241,7 +268,6 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
         String s = "select * from " + TABLE_NAME_FOLDER;
         Cursor cursor = db.rawQuery(s, null);
         List<String> re = new ArrayList<String>();
-        int j = 0;
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 re.add(cursor.getString(1));
@@ -263,8 +289,27 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                re.add(cursor.getString(1));
-                Log.d("test", String.valueOf(cursor.getString(1)));
+                re.add(cursor.getString(0));
+            }
+            cursor.close();
+        }
+        db.close();
+        return re;
+    }
+
+    /*
+    查询所有link
+     */
+    public List<String> QueryLinkByChannel(){
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("select RSSlink from " + TABLE_NAME_CHANNEL, null);
+//        Cursor cursor = db.query(TABLE_NAME_CHANNEL, null, null, null, null, null, null);
+        List<String> re = new ArrayList<String>();
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                re.add(cursor.getString(0));
+                Log.d("aaaaaaaaaa", "QueryLinkByChannel: " + cursor.getString(0));
             }
             cursor.close();
         }
@@ -275,21 +320,29 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
     /*
    删除文件夹
      */
-    public void DeleteFolderByName(String name){
+    public long DeleteFolderByName(String name){
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_NAME_FOLDER, "name = ?", new String[] {name});
+        return db.delete(TABLE_NAME_FOLDER, "name = ?", new String[] {name});
     }
 
     /*
     文件夹重命名
      */
-    public void UpdateFolderByName(String oldName, String newName){
+    public long UpdateFolderByName(String oldName, String newName){
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
 
         values.put("name", newName);
 
-        db.update(TABLE_NAME_FOLDER, values, "name = ?", new String[] {oldName});
+        long x = db.update(TABLE_NAME_FOLDER, values, "name = ?", new String[] {oldName});
+        if(x != -1){
+            ContentValues values1 = new ContentValues();
+            values1.put("folderName", newName);
+            db.update(TABLE_NAME_FOLDER_ITEM, values1, "folderName = ?", new String[] {oldName});
+            return 1;
+        }
+        else
+            return -1;
     }
 }

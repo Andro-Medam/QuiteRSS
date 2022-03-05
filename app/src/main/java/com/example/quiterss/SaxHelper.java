@@ -22,6 +22,7 @@ public class SaxHelper extends DefaultHandler {
     private ArrayList<Folder_item> folder_items;
     private String tagName = null;
     private String folder_title = null;
+    private String desc = null;
     private Boolean bl = false;
 
     @Override
@@ -37,6 +38,7 @@ public class SaxHelper extends DefaultHandler {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         if(localName.equals("item")){
             item = new Item();
+            desc = "";
             folder_item = new Folder_item();
             bl = true;
         }else if (localName.equals("channel")){
@@ -59,7 +61,8 @@ public class SaxHelper extends DefaultHandler {
                         Log.d("TAG", "characters: " +data);
                         break;
                     case "description":
-                        this.item.setDescription(data);
+                        desc = desc + data;
+                        Log.d("TAG", "--------" +data + "\n" + tagName);
                         break;
                     case "link":
                         this.item.setLink(data);
@@ -98,9 +101,13 @@ public class SaxHelper extends DefaultHandler {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if(localName.equals("item")){
             item.setRead(0);
+            Log.d("TAG", "characters: " + desc);
+            this.item.setDescription(desc);
+            this.item.setChannel(channel.getTitle());
             this.items.add(item);
             Log.d("aaaaaaaaaaaaaaa", "endElement: 解析了一条数据");
             this.folder_items.add(folder_item);
+            desc = null;
             item = null;
             folder_item = null;
         }
