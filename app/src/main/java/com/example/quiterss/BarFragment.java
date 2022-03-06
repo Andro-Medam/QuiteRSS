@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -71,7 +72,6 @@ public class BarFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 showPopupMenu(view);
-                Toast.makeText(getActivity(), "you clicked more!", Toast.LENGTH_SHORT).show();
             }
         });
         return view;

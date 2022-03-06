@@ -101,7 +101,6 @@ public class SaxHelper extends DefaultHandler {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if(localName.equals("item")){
             item.setRead(0);
-            Log.d("TAG", "characters: " + desc);
             this.item.setDescription(desc);
             this.item.setChannel(channel.getTitle());
             this.items.add(item);
