@@ -1,4 +1,4 @@
-package com.example.quiterss;
+package com.example.quiterss.searchPage;
 
 import android.os.Bundle;
 
@@ -9,9 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
-import java.security.PrivateKey;
+import com.example.quiterss.R;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,7 +65,7 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_search_listview, container, false);
+        View view = inflater.inflate(R.layout.fragment_search_recyview, container, false);
         rv = view.findViewById(R.id.search_item_rv);
         String toSearch = null;
 
@@ -78,4 +77,6 @@ public class SearchFragment extends Fragment {
         rv.setAdapter(new RecyclerviewAdapter(getActivity(), toSearch));
         return view;
     }
+
+
 }

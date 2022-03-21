@@ -1,14 +1,13 @@
-package com.example.quiterss;
+package com.example.quiterss.mainPage;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +17,10 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.example.quiterss.MySQLiteOpenHelper;
+import com.example.quiterss.R;
+import com.example.quiterss.SaxHelper;
+import com.example.quiterss.searchPage.SearchFragment;
 import com.example.quiterss.bean.Channel;
 import com.example.quiterss.bean.Folder;
 import com.example.quiterss.bean.Folder_item;
@@ -60,12 +63,15 @@ public class BarFragment extends Fragment {
         search_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                SearchFragment searchFragment = new SearchFragment();
-                Bundle args = new Bundle();
-                args.putString("toSearch", search_et.getText().toString());
-                searchFragment.setArguments(args);
-                fragmentManager.beginTransaction().replace(R.id.frag_main_container, searchFragment).addToBackStack(null).commit();
+//                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//                SearchFragment searchFragment = new SearchFragment();
+//                Bundle args = new Bundle();
+//                args.putString("toSearch", search_et.getText().toString());
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                intent.putExtra("toSearch", search_et.getText().toString());
+                startActivity(intent);
+//                searchFragment.setArguments(args);
+//                fragmentManager.beginTransaction().replace(R.id.frag_main_container, searchFragment).addToBackStack(null).commit();
             }
         });
         more_iv.setOnClickListener(new View.OnClickListener() {
@@ -123,6 +129,30 @@ public class BarFragment extends Fragment {
                                 })
                                 .show();
                         return true;
+                    case R.id.add_folder:
+                        View folderView = getLayoutInflater().inflate(R.layout.add_folder_dialog, null);
+                        builder.setView(folderView)
+                                .setPositiveButton("添加", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        EditText et = folderView.findViewById(R.id.insert_folder_et);
+                                        EditText et2 = folderView.findViewById(R.id.insert_desc_et);
+                                        if (!et.getText().toString().equals("")) {
+                                            Folder folder = new Folder();
+                                            folder.setName(et.getText().toString());
+                                            folder.setDescription(et2.getText().toString());
+                                            folder.setStatus("1");
+                                            if (mySQLiteOpenHelper.InsertFolder(folder) != -1){
+                                                Toast.makeText(getActivity(), "添加成功", Toast.LENGTH_SHORT).show();
+                                            }
+                                            else
+                                                Toast.makeText(getActivity(), "添加出错，请重新检查！", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(getActivity(), "输入不能为空", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                })
+                                .show();
                     default:
                         return false;
                 }
@@ -135,10 +165,12 @@ public class BarFragment extends Fragment {
         @Override
         public void run() {
             try {
+//                SaxHelper saxHelper = readXmlForSAX("https://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=10664&channel-name=Empirical+Software+Engineering");
                 SaxHelper saxHelper = readXmlForSAX(addUrlString);
 //                "https://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=10664&channel-name=Empirical+Software+Engineering"
                 Channel channel = saxHelper.getChannel();
                 channel.setRSSlink(addUrlString);
+//                channel.setRSSlink("https://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=10664&channel-name=Empirical+Software+Engineering");
                 Folder folder = saxHelper.getFolder();
                 ArrayList<Folder_item> folder_items = saxHelper.getFolder_items();
                 ArrayList<Item> items = saxHelper.getItems();

@@ -62,7 +62,7 @@ public class SaxHelper extends DefaultHandler {
                         break;
                     case "description":
                         desc = desc + data;
-                        Log.d("TAG", "--------" +data + "\n" + tagName);
+                        Log.d("TAG", "--------" +data);
                         break;
                     case "link":
                         this.item.setLink(data);
@@ -82,6 +82,8 @@ public class SaxHelper extends DefaultHandler {
                         this.channel.setTitle(data);
                         folder_title = data;
                         this.folder.setName(data);
+                        this.folder.setStatus("0");
+                        this.folder.setDescription("链接导入，自动创建的文件夹。");
                         break;
                     case "description":
                         this.channel.setDescription(data);

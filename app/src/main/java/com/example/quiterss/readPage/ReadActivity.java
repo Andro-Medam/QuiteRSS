@@ -1,10 +1,12 @@
-package com.example.quiterss;
+package com.example.quiterss.readPage;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.example.quiterss.MySQLiteOpenHelper;
+import com.example.quiterss.R;
 import com.example.quiterss.bean.Item;
 
 public class ReadActivity extends Activity {

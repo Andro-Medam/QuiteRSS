@@ -35,9 +35,9 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_ITEM = "create table " + TABLE_NAME_ITEM + " (id integer primary key autoincrement, " +
             "title text, description text, link text, pubDate text, guid text, channel text, read integer);\n";
     private static final String CREATE_TABLE_CHANNEL = "create table " + TABLE_NAME_CHANNEL + " (id integer primary key autoincrement, " +
-            "title text, description text, link text, RSSlink text unique not null);\n";
+            "title text unique not null, description text, link text, RSSlink text unique not null);\n";
     private static final String CREATE_TABLE_FOLDER = "create table " + TABLE_NAME_FOLDER + " (id integer primary key autoincrement, " +
-            "name text unique not null);\n";
+            "name text unique not null, description text, status text not null);\n";
     private static final String CREATE_TABLE_FOLDER_ITEM = "create table " + TABLE_NAME_FOLDER_ITEM + " (itemName text, folderName text, PRIMARY KEY(itemName,folderName));\n";
 
     public MySQLiteOpenHelper(Context context) {
@@ -76,82 +76,6 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
         Log.d("AA", "insert an item");
 
         return db.insert(TABLE_NAME_ITEM, null, values);
-    }
-
-
-    public void InsertItemFromURL(String url){
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        try{
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document document = db.parse(url);
-            NodeList itemList = document.getElementsByTagName("item");
-            NodeList channelTitle = document.getElementsByTagName("title");
-            NodeList channelDesc = document.getElementsByTagName("description");
-            NodeList channelLink = document.getElementsByTagName("link");
-
-            String folderTitle = channelTitle.item(0).getFirstChild().getNodeValue();
-            String folderDesc = channelDesc.item(0).getFirstChild().getNodeValue();
-            String folderLink = channelLink.item(0).getFirstChild().getNodeValue();
-
-            Channel channel = new Channel();
-            channel.setTitle(folderTitle);
-            channel.setDescription(folderDesc);
-            channel.setLink(folderLink);
-            InsertChannel(channel);
-
-            Folder folder = new Folder();
-            folder.setName(folderTitle);
-            InsertFolder(folder);
-
-            for(int i = 0; i < itemList.getLength(); i++) {
-                Item item = new Item();
-                Node n = itemList.item(i);
-                NamedNodeMap attrs = n.getAttributes();
-                NodeList childNodes = n.getChildNodes();
-                item.setRead(0);
-
-                String title = new String();
-                for (int k = 0; k < childNodes.getLength(); k++) {
-                    //区分出text类型的node以及element类型的node
-                    if (childNodes.item(k).getNodeType() == Node.ELEMENT_NODE) {
-                        switch (childNodes.item(k).getNodeName()) {
-                            case "title":
-                                title = childNodes.item(k).getTextContent();
-                                item.setTitle(title);
-                                break;
-                            case "description":
-                                item.setDescription(childNodes.item(k).getTextContent());
-                                break;
-                            case "link":
-                                item.setLink(childNodes.item(k).getTextContent());
-                                break;
-                            case "pubDate":
-                                item.setPubDate(childNodes.item(k).getTextContent());
-                                break;
-                            case "guid":
-                                item.setGuid(childNodes.item(k).getTextContent());
-                                break;
-                            default:
-                                break;
-                            //获取了element类型节点的节点名
-                            //System.out.print("第" + (k + 1) + "个节点的节点名：" + childNodes.item(k).getNodeName());
-                            //获取了element类型节点的节点值
-                            // System.out.println("--节点值是：" + childNodes.item(k).getFirstChild().getNodeValue());
-                            //System.out.println("--节点值是：" + childNodes.item(k).getTextContent());
-                        }
-                    }
-                }
-                InsertItem(item);
-
-                Folder_item folder_item = new Folder_item();
-                folder_item.setFolderName(folderTitle);
-                folder_item.setItemName(title);
-                InsertFolderItem(folder_item);
-            }
-        }catch (Exception e){
-            //Toast.makeText(getActivity(), "you clicked more!", Toast.LENGTH_SHORT).show();
-        }
-
     }
 
     /*
@@ -207,6 +131,8 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put("name", folder.getName());
+        values.put("status", folder.getStatus());
+        values.put("description", folder.getDescription());
 
         return db.insert(TABLE_NAME_FOLDER, null, values);
     }
@@ -267,6 +193,21 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
 
         String s = "select * from " + TABLE_NAME_FOLDER;
         Cursor cursor = db.rawQuery(s, null);
+        List<String> re = new ArrayList<String>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                re.add(cursor.getString(1));
+            }
+            cursor.close();
+        }
+        db.close();
+        return re;
+    }
+
+    public List<String> QueryFolderByUserOrSys(String i){
+        SQLiteDatabase db = getWritableDatabase();
+
+        Cursor cursor = db.query(TABLE_NAME_FOLDER, null, "status = ?", new String[]{i}, null, null, null);
         List<String> re = new ArrayList<String>();
         if (cursor != null) {
             while (cursor.moveToNext()) {

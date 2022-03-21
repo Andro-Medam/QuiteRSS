@@ -1,4 +1,4 @@
-package com.example.quiterss;
+package com.example.quiterss.mainPage;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -19,6 +19,9 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.quiterss.MySQLiteOpenHelper;
+import com.example.quiterss.R;
+import com.example.quiterss.readPage.ReadActivity;
 import com.example.quiterss.bean.Folder;
 import com.example.quiterss.bean.Folder_item;
 
@@ -155,30 +158,6 @@ public class ExpandedAdapter extends BaseExpandableListAdapter {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                 switch (menuItem.getItemId()){
-                    case R.id.add_folder:
-                        View folderView = mInflater.inflate(R.layout.add_folder_dialog, null);
-                        builder.setView(folderView)
-                                .setPositiveButton("添加", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        EditText et = folderView.findViewById(R.id.insert_folder_et);
-                                        if (!et.getText().toString().equals("")) {
-                                            Folder folder = new Folder();
-                                            folder.setName(et.getText().toString());
-                                            if (mySQLiteOpenHelper.InsertFolder(folder) != -1){
-                                                group.add(et.getText().toString());
-                                                child.add(new ArrayList<String>());
-                                                Toast.makeText(mContext, "添加成功", Toast.LENGTH_SHORT).show();
-                                            }
-                                            else
-                                                Toast.makeText(mContext, "添加出错，请重新检查！", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            Toast.makeText(mContext, "输入不能为空", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                })
-                                .show();
-                        return true;
                     case R.id.delete_folder:
                         View delete_dialog = mInflater.inflate(R.layout.delete_folder_dialog, null);
                         CheckBox checkBox = delete_dialog.findViewById(R.id.delete_items_cb);
@@ -240,8 +219,9 @@ public class ExpandedAdapter extends BaseExpandableListAdapter {
         PopupMenu popupMenu = new PopupMenu(mContext, view);
         popupMenu.getMenuInflater().inflate(R.menu.item_longclick_menu, popupMenu.getMenu());
         SubMenu subMenu = popupMenu.getMenu().addSubMenu("添加到文件夹");
-        for(int i = 0; i < group.size(); i++){
-            subMenu.add(1, i+1, 1,group.get(i));
+        List<String> userFolder = mySQLiteOpenHelper.QueryFolderByUserOrSys("1");
+        for(int i = 0; i < userFolder.size(); i++){
+            subMenu.add(1, i+1, 1,userFolder.get(i));
         }
 
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -251,12 +231,12 @@ public class ExpandedAdapter extends BaseExpandableListAdapter {
                     int f = menuItem.getItemId();
                     Log.d("aaaaaaaaaaaaaa", "onMenuItemClick: " + f);
                     Folder_item folder_item = new Folder_item();
-                    folder_item.setFolderName(group.get(f-1));
+                    folder_item.setFolderName(userFolder.get(f-1));
                     folder_item.setItemName(child.get(groupPosition).get(childPosition));
                     if (mySQLiteOpenHelper.InsertFolderItem(folder_item) == -1){
                         Toast.makeText(mContext, "该文件已经存在！", Toast.LENGTH_SHORT).show();
                     }else{
-                        child.get(f-1).add(child.get(groupPosition).get(childPosition));
+                        Toast.makeText(mContext, "添加成功！", Toast.LENGTH_SHORT).show();
                     }
 
                 }

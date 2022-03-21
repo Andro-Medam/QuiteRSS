@@ -5,5 +5,7 @@
         android:title="添加url"/>
     <item android:id="@+id/refresh_url"
         android:title="更新信息源"/>
+    <item android:id="@+id/add_folder"
+        android:title="添加文件夹"/>
 
 </menu>
